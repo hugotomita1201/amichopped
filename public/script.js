@@ -1,4 +1,4 @@
-// public/script.js (Definitive, Corrected Version)
+// public/script.js (Updated with Potential Score on a dedicated slide)
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- Page & Element Selection ---
@@ -110,30 +110,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const scrollContainer = document.createElement('div');
         scrollContainer.id = 'results-scroll-container';
 
+        // --- Slide 1: Overall Analysis (No Potential Score Here Anymore) ---
         if (typeof data.overallScore === 'number') {
             const distInfo = getDistributionInfo(data.overallScore);
             const overallSlide = document.createElement('div');
             overallSlide.className = 'result-slide';
-            overallSlide.innerHTML = `<div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Your Photo" class="result-image"></div><div class="result-analysis-panel"><h3 class="feature-title">Overall Analysis</h3><div class="flex items-center justify-center mb-4"><span class="rating-score">${data.overallScore.toFixed(1)}</span><span class="rating-total">/ 10</span></div><div class="distribution-chart-container"><div class="chart-statement"><h4>Where You Stand</h4><p>Your score places you in the <strong>top ${distInfo.percentile}</strong> of the population, within the <strong>${distInfo.tier}</strong>.</p></div><div class="distribution-chart"><svg class="chart-curve" viewBox="0 0 200 100" preserveAspectRatio="none"><path d="M0,100 C80,-40 120,40 200,100 Z"></path></svg><div class="chart-marker" style="left: ${distInfo.position}%;"></div></div><div class="chart-labels"><span>Below Avg.</span><span>Average</span><span>Attractive</span><span>Elite</span></div></div><p class="overall-summary">${data.overallSummary || 'A summary of your overall facial aesthetics.'}</p></div>`;
+
+            overallSlide.innerHTML = `
+            <div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Your Photo" class="result-image"></div>
+            <div class="result-analysis-panel">
+                <h3 class="feature-title">Overall Analysis</h3>
+                <div class="flex items-center justify-center mb-4"><span class="rating-score">${data.overallScore.toFixed(1)}</span><span class="rating-total">/ 10</span></div>
+                <div class="distribution-chart-container">
+                    <div class="chart-statement"><h4>Where You Stand</h4><p>Your score places you in the <strong>top ${distInfo.percentile}</strong> of the population, within the <strong>${distInfo.tier}</strong>.</p></div>
+                    <div class="distribution-chart"><svg class="chart-curve" viewBox="0 0 200 100" preserveAspectRatio="none"><path d="M0,100 C80,-40 120,40 200,100 Z"></path></svg><div class="chart-marker" style="left: ${distInfo.position}%;"></div></div>
+                    <div class="chart-labels"><span>Below Avg.</span><span>Average</span><span>Attractive</span><span>Elite</span></div>
+                </div>
+                <p class="overall-summary">${data.overallSummary || 'A summary of your overall facial aesthetics.'}</p>
+            </div>`;
             scrollContainer.appendChild(overallSlide);
         }
 
+        // --- Feature Slides ---
         if (data.analysis && Array.isArray(data.analysis)) {
             data.analysis.forEach(item => {
                 const slide = document.createElement('div');
                 slide.className = 'result-slide';
-
-                // =================================================================
-                // === THIS IS THE CRITICAL FIX I MISSED. IT IS NOW CORRECT. ===
-                // This attaches the zoom data to the slide element itself.
                 if (item.boundingBox) {
                     slide.dataset.bbox = JSON.stringify(item.boundingBox);
                 }
                 if (item.featureName) {
                     slide.dataset.featureName = item.featureName;
                 }
-                // =================================================================
-
                 let ratingsGridHTML = '<div class="ratings-grid">';
                 if (typeof item.aestheticRating === 'number') ratingsGridHTML += `<div class="rating-item"><div class="rating-label">Aesthetic</div><div class="rating-value-small">${item.aestheticRating.toFixed(1)}</div></div>`;
                 if (typeof item.harmonyRating === 'number') ratingsGridHTML += `<div class="rating-item"><div class="rating-label">Harmony</div><div class="rating-value-small">${item.harmonyRating.toFixed(1)}</div></div>`;
@@ -145,14 +153,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollContainer.appendChild(slide);
             });
         }
+
+        // --- NEW: Dedicated slide for the Potential Score ---
+        if (typeof data.potentialScore === 'number' && data.potentialSummary) {
+            const potentialSlide = document.createElement('div');
+            potentialSlide.className = 'result-slide';
+            potentialSlide.innerHTML = `
+                <div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Your Potential" class="result-image"></div>
+                <div class="result-analysis-panel">
+                    <h3 class="feature-title">Potential Analysis</h3>
+                    <div class="potential-score-container" style="border-top: none; padding-top: 0; margin-top: 0;">
+                         <div class="potential-score-header">
+                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+                            <h4 class="potential-title">Your Potential Score</h4>
+                        </div>
+                        <div class="potential-score-value">${data.potentialScore.toFixed(1)} <span class="rating-total">/ 10</span></div>
+                        <p class="potential-summary">${data.potentialSummary}</p>
+                    </div>
+                </div>
+            `;
+            scrollContainer.appendChild(potentialSlide);
+        }
+
+        // --- The Action Plan Slide (Last) ---
         if (data.recommendedProducts && data.recommendedProducts.length > 0) {
             const planSlide = document.createElement('div');
             planSlide.className = 'result-slide';
             let productsHTML = '';
             data.recommendedProducts.forEach(prod => {
-                productsHTML += `<div class="mb-6 pb-6 border-b border-gray-200"><h5 class="font-semibold text-lg text-gray-800">${prod.name}</h5><p class="text-gray-600 mb-3">${prod.description}</p><a href="${prod.affiliateLink}" target="_blank" class="cta-button font-medium py-2 px-4 rounded-lg text-sm">View Product<svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></div>`;
+                productsHTML += `<div class="mb-6 pb-6 border-b border-gray-200 last:border-b-0"><h5 class="font-semibold text-lg text-gray-800">${prod.name}</h5><p class="text-gray-600 mb-3">${prod.description}</p><a href="${prod.affiliateLink}" target="_blank" class="cta-button font-medium py-2 px-4 rounded-lg text-sm">View Product<svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></div>`;
             });
-            planSlide.innerHTML = `<div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Personalized Plan" class="result-image"></div><div class="result-analysis-panel"><h3 class="feature-title">Your Personalized Plan</h3><p class="feature-description mb-8">Based on your analysis, here are the most impactful product types we recommend.</p><div style="max-height: 350px; overflow-y: auto; padding-right: 1rem;">${productsHTML}</div><p class="text-xs text-gray-400 mt-4">As an Amazon Associate, AURA may earn from qualifying purchases. This is not medical advice.</p><div class="mt-8 pt-6 border-t border-gray-200"><h4 class="font-semibold text-lg text-gray-800">Ready for the next step?</h4><p class="text-gray-600 mb-4">Generate a photorealistic AI looksmatch.</p><button id="launch-looksmatch-btn" class="cta-button font-medium py-2 px-4 rounded-lg text-sm">Launch Looksmatch Generator</button></div></div>`;
+            planSlide.innerHTML = `
+                <div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Your Action Plan" class="result-image"></div>
+                <div class="result-analysis-panel">
+                    <h3 class="feature-title">Your Action Plan</h3>
+                    <p class="feature-description mb-8">Based on your potential analysis, here are the most impactful product types we recommend to help you reach your goals.</p>
+                    <div class="action-plan-products">${productsHTML}</div>
+                    <p class="text-xs text-gray-400 mt-4">As an Amazon Associate, AURA may earn from qualifying purchases. This is not medical advice.</p>
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <h4 class="font-semibold text-lg text-gray-800">Ready for the next step?</h4>
+                        <p class="text-gray-600 mb-4">Generate a photorealistic AI looksmatch to see another perspective.</p>
+                        <button id="launch-looksmatch-btn" class="cta-button font-medium py-2 px-4 rounded-lg text-sm">Launch Looksmatch Generator</button>
+                    </div>
+                </div>
+            `;
             scrollContainer.appendChild(planSlide);
         }
 
@@ -168,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const slides = Array.from(scrollContainer.querySelectorAll('.result-slide'));
         let currentSlide = 0;
 
-        // This is the correct, working zoom function for an <img> tag
         function applyStaticZoom(slideElement) {
             const image = slideElement.querySelector('.result-image');
             if (!image) return;
@@ -195,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (e) { console.error("Bbox parse error for zoom", e); }
             }
-            // Reset for slides with no bbox data
             image.style.transition = 'transform 0.4s ease-out';
             image.style.transform = 'scale(1) translate(0%, 0%)';
         }

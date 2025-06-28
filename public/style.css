@@ -190,8 +190,36 @@ body {
     width: 40%;
     max-width: 500px;
     text-align: center;
-
+    /* --- NEW --- */
+    max-height: 85vh;
+    /* Give it a max height, slightly less than the screen */
+    overflow-y: auto;
+    /* Add scrollbar only when its content is too tall */
+    padding: 2rem 1rem 2rem 0;
+    /* Adjust padding for scrollbar */
 }
+
+/* --- ADD THIS NEW RULESET for a clean scrollbar --- */
+.result-analysis-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.result-analysis-panel::-webkit-scrollbar-track {
+    background: transparent;
+    /* Make track invisible by default */
+}
+
+.result-analysis-panel::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    /* A light grey for the scrollbar */
+    border-radius: 10px;
+}
+
+.result-analysis-panel::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+    /* Darken slightly on hover */
+}
+
 
 .rating-score {
     font-size: 6rem;
@@ -596,4 +624,177 @@ body {
     #looksmatch-page .cta-button {
         margin-bottom: 2rem;
     }
+}
+
+/* --- Add these new rules to the end of your style.css file --- */
+
+/* Styles for the new Potential Score section */
+.potential-score-container {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.potential-score-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.potential-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.potential-score-value {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #10B981;
+    /* A nice green to indicate potential */
+}
+
+.potential-summary {
+    font-size: 1.125rem;
+    color: #4B5563;
+    line-height: 1.7;
+    margin-top: 1rem;
+    max-width: 450px;
+    /* Constrain line length for readability */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Styles for the new Action Plan product list */
+.action-plan-products {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 1rem;
+    /* For scrollbar spacing */
+    margin-top: 1.5rem;
+    text-align: left;
+    /* Align product info to the left */
+}
+
+/* Scrollbar styling for a cleaner look */
+.action-plan-products::-webkit-scrollbar {
+    width: 8px;
+}
+
+.action-plan-products::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.action-plan-products::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
+.action-plan-products::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* --- Add these new rules to the end of your style.css file --- */
+
+/* Styles for the new Potential Score section */
+.potential-score-container {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.potential-score-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.potential-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.potential-score-value {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #10B981;
+    /* A nice green to indicate potential */
+}
+
+.potential-summary {
+    font-size: 1.125rem;
+    color: #4B5563;
+    line-height: 1.7;
+    margin-top: 1rem;
+    max-width: 450px;
+    /* Constrain line length for readability */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Styles for the new Action Plan product list */
+.action-plan-products {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 1rem;
+    /* For scrollbar spacing */
+    margin-top: 1.5rem;
+    text-align: left;
+    /* Align product info to the left */
+}
+
+/* Scrollbar styling for a cleaner look */
+.action-plan-products::-webkit-scrollbar {
+    width: 8px;
+}
+
+.action-plan-products::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.action-plan-products::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
+.action-plan-products::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* --- Add this rule for the desktop scroll fix --- */
+.result-analysis-panel {
+    width: 40%;
+    max-width: 500px;
+    text-align: center;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 2rem 1rem 2rem 0;
+}
+
+.result-analysis-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.result-analysis-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.result-analysis-panel::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 10px;
+}
+
+.result-analysis-panel::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
 }
