@@ -109,19 +109,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (oldScrollContainer) oldScrollContainer.remove();
         const scrollContainer = document.createElement('div');
         scrollContainer.id = 'results-scroll-container';
+
+        // --- NEW: Use an <img> tag instead of a background-div ---
+
         if (typeof data.overallScore === 'number') {
             const distInfo = getDistributionInfo(data.overallScore);
             const overallSlide = document.createElement('div');
             overallSlide.className = 'result-slide';
-            overallSlide.innerHTML = `<div class="result-image-panel"><div class="result-image-container" style="background-image: url('${uploadedFileUrl}');"></div></div><div class="result-analysis-panel"><h3 class="feature-title">Overall Analysis</h3><div class="flex items-end mb-4"><span class="rating-score">${data.overallScore.toFixed(1)}</span><span class="rating-total">/ 10</span></div><p class="overall-summary">${data.overallSummary || 'A summary of your overall facial aesthetics.'}</p><div class="distribution-chart-container"><div class="chart-statement"><h4>Where You Stand</h4><p>Your score places you in the <strong>top ${distInfo.percentile}</strong> of the population, within the <strong>${distInfo.tier}</strong>.</p></div><div class="distribution-chart"><svg class="chart-curve" viewBox="0 0 200 100" preserveAspectRatio="none"><path d="M0,100 C50,0 150,0 200,100 Z"></path></svg><div class="chart-marker" style="left: ${distInfo.position}%;"></div></div><div class="chart-labels"><span>Below Avg.</span><span>Average</span><span>Attractive</span><span>Elite</span></div></div></div>`;
+            overallSlide.innerHTML = `<div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Your Photo" class="result-image"></div><div class="result-analysis-panel"><h3 class="feature-title">Overall Analysis</h3><div class="flex items-center justify-center mb-4"><span class="rating-score">${data.overallScore.toFixed(1)}</span><span class="rating-total">/ 10</span></div><p class="overall-summary">${data.overallSummary || 'A summary of your overall facial aesthetics.'}</p><div class="distribution-chart-container"><div class="chart-statement"><h4>Where You Stand</h4><p>Your score places you in the <strong>top ${distInfo.percentile}</strong> of the population, within the <strong>${distInfo.tier}</strong>.</p></div><div class="distribution-chart"><svg class="chart-curve" viewBox="0 0 200 100" preserveAspectRatio="none"><path d="M0,100 C50,0 150,0 200,100 Z"></path></svg><div class="chart-marker" style="left: ${distInfo.position}%;"></div></div><div class="chart-labels"><span>Below Avg.</span><span>Average</span><span>Attractive</span><span>Elite</span></div></div></div>`;
             scrollContainer.appendChild(overallSlide);
         }
+
         if (data.analysis && Array.isArray(data.analysis)) {
             data.analysis.forEach(item => {
                 const slide = document.createElement('div');
                 slide.className = 'result-slide';
-                if (item.boundingBox) slide.dataset.bbox = JSON.stringify(item.boundingBox);
-                if (item.featureName) slide.dataset.featureName = item.featureName;
+                // Note: The zoom logic will no longer apply, but we can re-implement it later if needed.
                 let ratingsGridHTML = '<div class="ratings-grid">';
                 if (typeof item.aestheticRating === 'number') ratingsGridHTML += `<div class="rating-item"><div class="rating-label">Aesthetic</div><div class="rating-value-small">${item.aestheticRating.toFixed(1)}</div></div>`;
                 if (typeof item.harmonyRating === 'number') ratingsGridHTML += `<div class="rating-item"><div class="rating-label">Harmony</div><div class="rating-value-small">${item.harmonyRating.toFixed(1)}</div></div>`;
@@ -129,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ratingsGridHTML += '</div>';
                 let lookalikeHTML = '';
                 if (item.celebrityLookalike) lookalikeHTML = `<div class="lookalike-section"><div class="lookalike-icon"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.98 9.11c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg></div><p class="lookalike-text">Feature reminiscent of <strong>${item.celebrityLookalike}</strong></p></div>`;
-                slide.innerHTML = `<div class="result-image-panel"><div class="result-image-container" style="background-image: url('${uploadedFileUrl}');"></div></div><div class="result-analysis-panel"><h3 class="feature-title">${item.featureName || 'Feature Analysis'}</h3>${ratingsGridHTML}<p class="feature-description">${item.reasoning || 'Detailed analysis of this feature.'}</p>${lookalikeHTML}</div>`;
+                slide.innerHTML = `<div class="result-image-panel"><img src="${uploadedFileUrl}" alt="${item.featureName || 'Feature Analysis'}" class="result-image"></div><div class="result-analysis-panel"><h3 class="feature-title">${item.featureName || 'Feature Analysis'}</h3>${ratingsGridHTML}<p class="feature-description">${item.reasoning || 'Detailed analysis of this feature.'}</p>${lookalikeHTML}</div>`;
                 scrollContainer.appendChild(slide);
             });
         }
@@ -140,22 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
             data.recommendedProducts.forEach(prod => {
                 productsHTML += `<div class="mb-6 pb-6 border-b border-gray-200"><h5 class="font-semibold text-lg text-gray-800">${prod.name}</h5><p class="text-gray-600 mb-3">${prod.description}</p><a href="${prod.affiliateLink}" target="_blank" class="cta-button font-medium py-2 px-4 rounded-lg text-sm">View Product<svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></div>`;
             });
-            // <-- NEW: Added Looksmatch Button to the Personalized Plan slide
-            planSlide.innerHTML = `
-                <div class="result-image-panel"><div class="result-image-container" style="background-image: url('${uploadedFileUrl}');"></div></div>
-                <div class="result-analysis-panel">
-                    <h3 class="feature-title">Your Personalized Plan</h3>
-                    <p class="feature-description mb-8">Based on your analysis, here are the most impactful product types we recommend.</p>
-                    <div style="max-height: 350px; overflow-y: auto; padding-right: 1rem;">${productsHTML}</div>
-                    <p class="text-xs text-gray-400 mt-4">As an Amazon Associate, AURA may earn from qualifying purchases. This is not medical advice.</p>
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                        <h4 class="font-semibold text-lg text-gray-800">Ready for the next step?</h4>
-                        <p class="text-gray-600 mb-4">Generate a photorealistic AI looksmatch.</p>
-                        <button id="launch-looksmatch-btn" class="cta-button font-medium py-2 px-4 rounded-lg text-sm">Launch Looksmatch Generator</button>
-                    </div>
-                </div>`;
+            planSlide.innerHTML = `<div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Personalized Plan" class="result-image"></div><div class="result-analysis-panel"><h3 class="feature-title">Your Personalized Plan</h3><p class="feature-description mb-8">Based on your analysis, here are the most impactful product types we recommend.</p><div style="max-height: 350px; overflow-y: auto; padding-right: 1rem;">${productsHTML}</div><p class="text-xs text-gray-400 mt-4">As an Amazon Associate, AURA may earn from qualifying purchases. This is not medical advice.</p><div class="mt-8 pt-6 border-t border-gray-200"><h4 class="font-semibold text-lg text-gray-800">Ready for the next step?</h4><p class="text-gray-600 mb-4">Generate a photorealistic AI looksmatch.</p><button id="launch-looksmatch-btn" class="cta-button font-medium py-2 px-4 rounded-lg text-sm">Launch Looksmatch Generator</button></div></div>`;
             scrollContainer.appendChild(planSlide);
         }
+
         if (resultsNav) {
             resultsPage.insertBefore(scrollContainer, resultsNav);
         } else {
@@ -163,7 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         setupCarousel(scrollContainer);
     }
-
     function setupCarousel(scrollContainer) {
         const slides = Array.from(scrollContainer.querySelectorAll('.result-slide'));
         let currentSlide = 0;
@@ -176,33 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         const dots = Array.from(dotsContainer.querySelectorAll('.dot'));
 
-        function applyStaticZoom(slideElement) {
-            const imageContainer = slideElement.querySelector('.result-image-container');
-            if (!imageContainer) return;
-            const bboxData = slideElement.dataset.bbox;
-            const featureName = slideElement.dataset.featureName;
-            if (bboxData && bboxData.trim() !== "") {
-                try {
-                    const bbox = JSON.parse(bboxData);
-                    if (typeof bbox.x === 'number') {
-                        const padding = 0.1;
-                        const largerDimension = Math.max(bbox.width, bbox.height);
-                        const zoomLevel = 1 / (largerDimension * (1 + padding));
-                        const centerX = bbox.x + bbox.width / 2;
-                        let centerY = bbox.y + bbox.height / 2;
-                        if (featureName === 'Nose' || featureName === 'Mouth & Jaw') {
-                            const verticalOffset = bbox.height * 0.2;
-                            centerY += verticalOffset;
-                        }
-                        imageContainer.style.backgroundSize = `${zoomLevel * 100}%`;
-                        imageContainer.style.backgroundPosition = `${centerX * 100}% ${centerY * 100}%`;
-                        return;
-                    }
-                } catch (e) { console.error("Bbox parse error", e); }
-            }
-            imageContainer.style.backgroundSize = 'cover';
-            imageContainer.style.backgroundPosition = 'center';
-        }
+
 
         function updateUI() {
             if (slides[currentSlide]) applyStaticZoom(slides[currentSlide]);

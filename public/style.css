@@ -181,19 +181,17 @@ body {
 /* This is now our main image display area */
 /* Replace the old rule with this updated one */
 /* Replace the old rule with this updated one */
-.result-image-container {
+/* NEW: Styles for the result-image IMG tag to ensure it fits without cropping */
+.result-image {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    height: 100%;
+    object-fit: contain;
+    /* This is the magic property! */
     border-radius: 0.5rem;
-    background-color: #f3f4f6;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    /* --- THESE ARE THE NEW LINES --- */
     border: 1px solid #e5e7eb;
-    /* Adds a thin, light-grey border */
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-    /* Adds a soft, subtle shadow */
+    background-color: #f9fafb;
+    /* A light background for any empty space */
 }
 
 .result-analysis-panel {
