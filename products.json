@@ -1,0 +1,30 @@
+[
+    {
+        "id": "SKN001",
+        "productType": "Gentle Hydrating Cleanser",
+        "name": "CeraVe Hydrating Facial Cleanser",
+        "description": "A gentle, non-foaming face wash with hyaluronic acid, ceramides, and glycerin to help hydrate skin without stripping moisture.",
+        "affiliateLink": "https://www.amazon.com/CeraVe-Hydrating-Facial-Cleanser-Fragrance/dp/B01MSSDEPK/?tag=YOUR_TAG_HERE"
+    },
+    {
+        "id": "SKN002",
+        "productType": "SPF 50+ Sunscreen",
+        "name": "La Roche-Posay Anthelios Melt-In Milk Sunscreen SPF 60",
+        "description": "A fast-absorbing, velvety texture sunscreen suitable for face and body. Broad-spectrum protection with a non-greasy finish.",
+        "affiliateLink": "https://www.amazon.com/Roche-Posay-Anthelios-Sunscreen-Broad-Spectrum/dp/B002C1E12K/?tag=YOUR_TAG_HERE"
+    },
+    {
+        "id": "SKN003",
+        "productType": "Tretinoin (Prescription)",
+        "name": "Tretinoin Cream/Gel (Retin-A)",
+        "description": "A powerful retinoid that increases skin cell turnover. Used to treat acne, fine lines, and hyperpigmentation. Requires a dermatologist's prescription.",
+        "affiliateLink": "https://www.goodrx.com/tretinoin?tag=YOUR_TAG_HERE"
+    },
+    {
+        "id": "HAR001",
+        "productType": "Volumizing Shampoo",
+        "name": "Biolage Volume Bloom Shampoo",
+        "description": "Gently cleanses hair with minimal stripping while adding lightweight volume and shine. Paraben-free formula suitable for color-treated hair.",
+        "affiliateLink": "https://www.amazon.com/BIOLAGE-Volume-Bloom-Shampoo-Liter/dp/B00ID136ZM/?tag=YOUR_TAG_HERE"
+    }
+]

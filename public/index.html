@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceRate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="antialiased">
+
+    <div id="home-page" class="page active flex items-center justify-center">
+        <div class="flex h-screen w-screen">
+            <div class="panel left-panel flex items-center justify-center">
+                <div class="corner-logo" style="left: 2rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 9.25624 20.9452 6.77255 19.2212 5"
+                            stroke="#1F2937" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                </div>
+                <div class="analysis-wrapper">
+                    <div class="static-image-container">
+                        <img src="/images/base.jpg" alt="Before" class="static-image">
+                    </div>
+                </div>
+            </div>
+            <div class="panel right-panel flex items-center justify-center">
+                <div class="corner-logo" style="right: 2rem;"><span class="text-gray-500">FaceRate</span></div>
+                <div>
+                    <h1 class="text-5xl md:text-6xl font-semibold text-gray-800 mb-2">FaceRate is live.</h1>
+                    <p class="text-lg max-w-md text-gray-500 mb-8">Get your facial analysis, see what your best-looking
+                        self could look like and get your tailored transformation plan.</p>
+                    <button id="go-to-upload" class="cta-button font-medium py-3 px-6 rounded-full text-base">Begin
+                        Analysis<svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="upload-page" class="page">
+        <div class="flex flex-col items-center justify-center h-full relative">
+            <div class="absolute top-0 left-0 p-8"><button id="back-to-home"
+                    class="cta-button back-button p-2 rounded-full text-sm"><svg class="w-6 h-6" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg></button></div>
+            <div class="absolute top-0 right-0 p-8"><span class="text-gray-500 text-xl font-semibold">FaceRate</span>
+            </div>
+            <div class="upload-container text-center">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-2">Upload Your Photo</h2>
+                <p class="text-gray-500 mb-2">For the best results, use a clear, front-facing photo with neutral
+                    lighting.</p>
+                <p class="text-xs text-gray-400 mb-8">
+                    Please note: Blurry photos, non-frontal angles, or poor lighting will significantly impact the AI's
+                    ability to provide an accurate analysis.
+                </p>
+                <div id="drop-zone" class="drop-zone w-full p-10 rounded-lg text-center cursor-pointer">
+                    <input type="file" id="file-input" class="hidden" accept="image/*">
+                    <div id="upload-prompt"><svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor"
+                            fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path
+                                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-600"><span class="font-medium text-gray-700">Drag and
+                                drop</span> or click to upload</p>
+                        <p class="text-xs text-gray-500 mt-1">PNG, JPG, JPEG up to 10MB</p>
+                    </div>
+                    <div id="preview-container" class="hidden flex-col items-center"><img id="image-preview"
+                            class="rounded-lg shadow-md mb-4" alt="Image preview">
+                        <p id="file-name" class="text-sm font-medium text-gray-800"></p>
+                    </div>
+                </div>
+                <div id="analyze-button-container" class="mt-8 hidden"><button id="go-to-results"
+                        class="cta-button font-medium py-3 px-8 rounded-full text-base w-full md:w-auto">Analyze
+                        Photo</button></div>
+            </div>
+            <div class="absolute bottom-4 text-center text-xs text-gray-400">
+                <p>Your privacy is paramount. Images are processed securely and are not stored.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="results-page" class="page">
+        <div id="results-nav">
+            <button id="prev-slide" class="nav-button"><svg class="w-5 h-5" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg></button>
+            <div id="progress-dots"></div>
+            <button id="next-slide" class="nav-button"><svg class="w-5 h-5" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg></button>
+        </div>
+    </div>
+
+    <div id="looksmatch-page" class="page flex flex-col items-center justify-center p-4 md:p-8">
+        <div class="w-full max-w-5xl mx-auto absolute top-0 left-0 right-0 p-4 md:p-8 flex items-center">
+            <button id="back-to-results-btn" class="cta-button back-button p-2 rounded-full text-sm">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+            </button>
+            <h2 class="text-2xl font-semibold text-gray-800 ml-4">AI Looksmatch Generator</h2>
+        </div>
+
+        <div
+            class="comparison-container w-full max-w-5xl flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+            <div class="image-holder">
+                <h3 class="image-title">Your Photo</h3>
+                <div id="user-photo-container" class="image-display">
+                </div>
+            </div>
+
+            <div class="image-holder">
+                <h3 class="image-title">Your Generated Looksmatch</h3>
+                <div id="looksmatch-photo-container" class="image-display">
+                    <div class="placeholder">
+                        <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21v-1a6 6 0 00-5.197-5.975M15 10a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-400">Your generated image will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full max-w-5xl mx-auto mt-8 text-center">
+            <button id="generate-looksmatch-btn"
+                class="cta-button font-medium py-3 px-8 rounded-full text-base w-full md:w-auto">Generate Your
+                Looksmatch</button>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50 hidden">
+        <div class="text-center">
+            <svg class="animate-spin h-10 w-10 text-gray-700 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+            </svg>
+            <p class="mt-4 text-lg font-medium text-gray-700">Analyzing...</p>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+
+</html>
