@@ -587,3 +587,108 @@ body {
         transform: rotate(360deg);
     }
 }
+
+/* =============================================== */
+/* --- V3.0 MOBILE RESPONSIVE STYLES --- */
+/* =============================================== */
+
+/* This media query applies styles only when the screen is 768px wide or less (tablets and phones) */
+@media (max-width: 768px) {
+
+    /* --- General Page Adjustments --- */
+    .page {
+        /* Allow vertical scrolling on mobile */
+        overflow-y: auto;
+    }
+
+    /* --- Homepage Adjustments --- */
+    #home-page .flex.h-screen {
+        flex-direction: column;
+        /* Stack left and right panels vertically */
+        height: auto;
+    }
+
+    #home-page .panel {
+        width: 100%;
+        height: auto;
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+
+    #home-page .left-panel {
+        /* Make the image smaller on mobile */
+        height: 50vh;
+        min-height: 300px;
+    }
+
+    #home-page .static-image-container {
+        width: 250px;
+        height: 320px;
+    }
+
+    /* --- Results Page Adjustments --- */
+    .result-slide {
+        flex-direction: column;
+        /* Stack the image and analysis panels vertically */
+        padding: 6rem 1.5rem 8rem 1.5rem;
+        /* Adjust padding for mobile */
+        gap: 2rem;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .result-image-panel,
+    .result-analysis-panel {
+        width: 100%;
+        /* Make panels take full width */
+        max-width: 100%;
+    }
+
+    .result-image-panel {
+        max-width: 350px;
+        /* Limit image width on mobile */
+    }
+
+    .result-analysis-panel {
+        text-align: center;
+        /* Center-align the analysis text */
+    }
+
+    .feature-title {
+        font-size: 1.75rem;
+        /* Decrease title font size */
+    }
+
+    .rating-score {
+        font-size: 4rem;
+        /* Decrease main rating score font size */
+    }
+
+    .ratings-grid {
+        justify-content: center;
+        /* Center the 3 smaller ratings */
+        gap: 1.5rem;
+    }
+
+    .lookalike-section,
+    .distribution-chart-container,
+    .chart-statement {
+        text-align: center;
+    }
+
+    /* --- Looksmatch Page Adjustments --- */
+    .comparison-container {
+        flex-direction: column;
+        /* Stack the two images vertically */
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+    }
+
+    .image-holder {
+        max-width: 300px;
+    }
+
+    #looksmatch-page .cta-button {
+        margin-bottom: 2rem;
+    }
+}
