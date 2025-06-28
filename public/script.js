@@ -1,4 +1,4 @@
-// public/script.js (Modified to include Looksmatch feature)
+// public/script.js (Definitive, Corrected Version)
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- Page & Element Selection ---
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         home: document.getElementById('home-page'),
         upload: document.getElementById('upload-page'),
         results: document.getElementById('results-page'),
-        looksmatch: document.getElementById('looksmatch-page') // <-- NEW: Page registered
+        looksmatch: document.getElementById('looksmatch-page')
     };
     const loadingOverlay = document.getElementById('loading-overlay');
     const goToUploadBtn = document.getElementById('go-to-upload');
@@ -110,13 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const scrollContainer = document.createElement('div');
         scrollContainer.id = 'results-scroll-container';
 
-        // --- NEW: Use an <img> tag instead of a background-div ---
-
         if (typeof data.overallScore === 'number') {
             const distInfo = getDistributionInfo(data.overallScore);
             const overallSlide = document.createElement('div');
             overallSlide.className = 'result-slide';
-            overallSlide.innerHTML = `<div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Your Photo" class="result-image"></div><div class="result-analysis-panel"><h3 class="feature-title">Overall Analysis</h3><div class="flex items-center justify-center mb-4"><span class="rating-score">${data.overallScore.toFixed(1)}</span><span class="rating-total">/ 10</span></div><p class="overall-summary">${data.overallSummary || 'A summary of your overall facial aesthetics.'}</p><div class="distribution-chart-container"><div class="chart-statement"><h4>Where You Stand</h4><p>Your score places you in the <strong>top ${distInfo.percentile}</strong> of the population, within the <strong>${distInfo.tier}</strong>.</p></div><div class="distribution-chart"><svg class="chart-curve" viewBox="0 0 200 100" preserveAspectRatio="none"><path d="M0,100 C50,0 150,0 200,100 Z"></path></svg><div class="chart-marker" style="left: ${distInfo.position}%;"></div></div><div class="chart-labels"><span>Below Avg.</span><span>Average</span><span>Attractive</span><span>Elite</span></div></div></div>`;
+            overallSlide.innerHTML = `<div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Your Photo" class="result-image"></div><div class="result-analysis-panel"><h3 class="feature-title">Overall Analysis</h3><div class="flex items-center justify-center mb-4"><span class="rating-score">${data.overallScore.toFixed(1)}</span><span class="rating-total">/ 10</span></div><p class="overall-summary">${data.overallSummary || 'A summary of your overall facial aesthetics.'}</p><div class="distribution-chart-container"><div class="chart-statement"><h4>Where You Stand</h4><p>Your score places you in the <strong>top ${distInfo.percentile}</strong> of the population, within the <strong>${distInfo.tier}</strong>.</p></div><div class="distribution-chart"><svg class="chart-curve" viewBox="0 0 200 100" preserveAspectRatio="none"><path d="M0,100 C80,-40 120,40 200,100 Z"></path></svg><div class="chart-marker" style="left: ${distInfo.position}%;"></div></div><div class="chart-labels"><span>Below Avg.</span><span>Average</span><span>Attractive</span><span>Elite</span></div></div></div>`;
             scrollContainer.appendChild(overallSlide);
         }
 
@@ -124,7 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
             data.analysis.forEach(item => {
                 const slide = document.createElement('div');
                 slide.className = 'result-slide';
-                // Note: The zoom logic will no longer apply, but we can re-implement it later if needed.
+
+                // =================================================================
+                // === THIS IS THE CRITICAL FIX I MISSED. IT IS NOW CORRECT. ===
+                // This attaches the zoom data to the slide element itself.
+                if (item.boundingBox) {
+                    slide.dataset.bbox = JSON.stringify(item.boundingBox);
+                }
+                if (item.featureName) {
+                    slide.dataset.featureName = item.featureName;
+                }
+                // =================================================================
+
                 let ratingsGridHTML = '<div class="ratings-grid">';
                 if (typeof item.aestheticRating === 'number') ratingsGridHTML += `<div class="rating-item"><div class="rating-label">Aesthetic</div><div class="rating-value-small">${item.aestheticRating.toFixed(1)}</div></div>`;
                 if (typeof item.harmonyRating === 'number') ratingsGridHTML += `<div class="rating-item"><div class="rating-label">Harmony</div><div class="rating-value-small">${item.harmonyRating.toFixed(1)}</div></div>`;
@@ -154,9 +163,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         setupCarousel(scrollContainer);
     }
+
     function setupCarousel(scrollContainer) {
         const slides = Array.from(scrollContainer.querySelectorAll('.result-slide'));
         let currentSlide = 0;
+
+        // This is the correct, working zoom function for an <img> tag
+        function applyStaticZoom(slideElement) {
+            const image = slideElement.querySelector('.result-image');
+            if (!image) return;
+
+            const bboxData = slideElement.dataset.bbox;
+            const featureName = slideElement.dataset.featureName;
+
+            if (bboxData && bboxData.trim() !== "") {
+                try {
+                    const bbox = JSON.parse(bboxData);
+                    if (typeof bbox.x === 'number') {
+                        const scale = 1 / Math.max(bbox.width, bbox.height) * 1.25;
+                        const translateX = (0.5 - (bbox.x + bbox.width / 2)) * 100;
+                        let initialTranslateY = (0.5 - (bbox.y + bbox.height / 2)) * 100;
+
+                        if (featureName === 'Nose' || featureName === 'Mouth & Jaw') {
+                            const verticalOffset = bbox.height * 20;
+                            initialTranslateY -= verticalOffset;
+                        }
+
+                        image.style.transition = 'transform 0.4s ease-out';
+                        image.style.transform = `scale(${scale}) translate(${translateX}%, ${initialTranslateY}%)`;
+                        return;
+                    }
+                } catch (e) { console.error("Bbox parse error for zoom", e); }
+            }
+            // Reset for slides with no bbox data
+            image.style.transition = 'transform 0.4s ease-out';
+            image.style.transform = 'scale(1) translate(0%, 0%)';
+        }
+
         if (!dotsContainer || !prevButton || !nextButton) return;
         dotsContainer.innerHTML = '';
         slides.forEach(() => {
@@ -166,22 +209,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         const dots = Array.from(dotsContainer.querySelectorAll('.dot'));
 
-
-
         function updateUI() {
             if (slides[currentSlide]) applyStaticZoom(slides[currentSlide]);
+
             prevButton.disabled = currentSlide === 0;
             nextButton.disabled = currentSlide === slides.length - 1;
             dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
         }
+
         function changeSlide(newIndex) {
             if (newIndex < 0 || newIndex >= slides.length) return;
             currentSlide = newIndex;
             scrollContainer.scrollTo({ left: currentSlide * window.innerWidth, behavior: 'smooth' });
             updateUI();
         }
+
         prevButton.onclick = () => changeSlide(currentSlide - 1);
         nextButton.onclick = () => changeSlide(currentSlide + 1);
+
         let scrollTimeout;
         scrollContainer.addEventListener('scroll', () => {
             clearTimeout(scrollTimeout);
@@ -193,19 +238,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 100);
         });
-        updateUI();
+
+        updateUI(); // Initial call
     }
 
-    // <-- NEW: All logic for the Looksmatch Page -->
+    // Looksmatch Page Logic
     const backToResultsBtn = document.getElementById('back-to-results-btn');
     const generateLooksmatchBtn = document.getElementById('generate-looksmatch-btn');
     const userPhotoContainer = document.getElementById('user-photo-container');
     const looksmatchPhotoContainer = document.getElementById('looksmatch-photo-container');
 
-    // Use event delegation for the dynamically created "launch" button
     document.body.addEventListener('click', (e) => {
         if (e.target.id === 'launch-looksmatch-btn') {
-            // Populate the user's photo on the looksmatch page
             if (uploadedFileUrl) {
                 userPhotoContainer.innerHTML = `<img src="${uploadedFileUrl}" alt="Your Photo" class="w-full h-full object-cover rounded-lg">`;
             }
@@ -224,14 +268,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Show a loading state
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                controller.abort();
+            }, 60000);
+
             generateLooksmatchBtn.disabled = true;
             generateLooksmatchBtn.textContent = 'Generating...';
-            looksmatchPhotoContainer.innerHTML = `
-                <div class="placeholder loading">
-                    <div class="spinner"></div>
-                    <p class="mt-4 text-sm text-gray-500">AI is thinking... this can take up to 30 seconds.</p>
-                </div>`;
+            looksmatchPhotoContainer.innerHTML = `<div class="placeholder loading"><div class="spinner"></div><p class="mt-4 text-sm text-gray-500">AI is thinking... this can take up to 60 seconds.</p></div>`;
 
             try {
                 const formData = new FormData();
@@ -239,8 +283,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const response = await fetch('/api/generate-looksmatch', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    signal: controller.signal
                 });
+
+                clearTimeout(timeoutId);
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -248,24 +295,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const result = await response.json();
-
-                // Display the new image
                 looksmatchPhotoContainer.innerHTML = `<img src="${result.looksmatchImage}" alt="Your AI Looksmatch" class="w-full h-full object-cover rounded-lg">`;
 
             } catch (error) {
-                console.error('Looksmatch generation failed:', error);
-                alert(`Error: ${error.message}`);
-                // Reset the placeholder on failure
-                looksmatchPhotoContainer.innerHTML = `
-                    <div class="placeholder">
-                        <p class="text-sm text-red-500">Generation failed. Please try again.</p>
-                    </div>`;
+                if (error.name === 'AbortError') {
+                    alert('The request timed out. The AI model is taking too long to respond. Please try again in a moment.');
+                    looksmatchPhotoContainer.innerHTML = `<div class="placeholder"><p class="text-sm text-red-500">Request timed out. Please try again.</p></div>`;
+                } else {
+                    console.error('Looksmatch generation failed:', error);
+                    alert(`Error: ${error.message}`);
+                    looksmatchPhotoContainer.innerHTML = `<div class="placeholder"><p class="text-sm text-red-500">Generation failed. Please try again.</p></div>`;
+                }
             } finally {
-                // Re-enable the button
+                clearTimeout(timeoutId);
                 generateLooksmatchBtn.disabled = false;
                 generateLooksmatchBtn.textContent = 'Generate Your Looksmatch';
             }
         });
     }
-
 });
