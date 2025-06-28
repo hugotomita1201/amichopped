@@ -1,4 +1,4 @@
-// public/script.js (Updated with Potential Score on a dedicated slide)
+// public/script.js (Corrected with error fix)
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- Page & Element Selection ---
@@ -110,12 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const scrollContainer = document.createElement('div');
         scrollContainer.id = 'results-scroll-container';
 
-        // --- Slide 1: Overall Analysis (No Potential Score Here Anymore) ---
+        // --- Slide 1: Overall Analysis ---
         if (typeof data.overallScore === 'number') {
             const distInfo = getDistributionInfo(data.overallScore);
             const overallSlide = document.createElement('div');
             overallSlide.className = 'result-slide';
 
+            // --- THIS BLOCK IS NOW CORRECTED ---
             overallSlide.innerHTML = `
             <div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Your Photo" class="result-image"></div>
             <div class="result-analysis-panel">
@@ -125,9 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="chart-statement"><h4>Where You Stand</h4><p>Your score places you in the <strong>top ${distInfo.percentile}</strong> of the population, within the <strong>${distInfo.tier}</strong>.</p></div>
                     <div class="distribution-chart"><svg class="chart-curve" viewBox="0 0 200 100" preserveAspectRatio="none"><path d="M0,100 C80,-40 120,40 200,100 Z"></path></svg><div class="chart-marker" style="left: ${distInfo.position}%;"></div></div>
                     <div class="chart-labels"><span>Below Avg.</span><span>Average</span><span>Attractive</span><span>Elite</span></div>
+                    <p class="chart-disclaimer">
+                        Note: This chart reflects a right-skewed distribution, where scores above 7 are highly attractive, scores above 8 are in the top 10% of the population, and scores above 9 are considered elite. 
+                    </p>
                 </div>
                 <p class="overall-summary">${data.overallSummary || 'A summary of your overall facial aesthetics.'}</p>
-            </div>`;
+            </div>
+            `;
             scrollContainer.appendChild(overallSlide);
         }
 
@@ -154,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- NEW: Dedicated slide for the Potential Score ---
+        // --- Dedicated slide for the Potential Score ---
         if (typeof data.potentialScore === 'number' && data.potentialSummary) {
             const potentialSlide = document.createElement('div');
             potentialSlide.className = 'result-slide';

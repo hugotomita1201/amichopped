@@ -798,3 +798,22 @@ body {
 .result-analysis-panel::-webkit-scrollbar-thumb:hover {
     background: #d1d5db;
 }
+
+/* --- Add this new rule to the end of your style.css --- */
+
+.chart-disclaimer {
+    font-size: 0.875rem;
+    /* A bit smaller for a disclaimer */
+    color: #6B7280;
+    /* Muted gray color */
+    line-height: 1.6;
+    /* Good line spacing for readability */
+    margin-top: 1.5rem;
+    /* Space above the disclaimer */
+    max-width: 500px;
+    /* Constrain width for readability */
+    margin-left: auto;
+    /* Center the text block */
+    margin-right: auto;
+    /* Center the text block */
+}

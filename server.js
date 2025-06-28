@@ -38,7 +38,8 @@ All scores represent a percentile ranking on a normal distribution curve of the 
 * **9.5 - 9.9 (Top 0.1% - "Supermodel Tier"):** Elite facial aesthetics.
 * **9.0 - 9.5 (Top 1% - "Extremely Attractive"):** Close to elite features.
 * **8.0 - 9.0 (Top 10% - "Highly Attractive"):** Clearly in the upper echelon of attractiveness.
-* **6.0 - 8.0 (Top 25% - "Attractive"):** Noticeably more attractive than average.
+* **7.0 - 8.0 (Top 15% - "Very Attractive"):** Very attractive features.
+* **6.0 - 7.0 (Top 30% - "Attractive"):** Noticeably more attractive than average.
 * **4.5 - 6.0 ("Average"):** Represents the vast majority of the population. A 5.0 is a perfectly average and typical face for the user's probable ethnicity.
 * **< 4.5 ("Below Average"):** Features show significant deviations from typical aesthetic proportions.
 * **1.0 ("Lowest Percentile"):** Represents severe facial dysmorphia. Use extreme caution and a supportive tone for scores below 4.0.
