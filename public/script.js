@@ -34,9 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function getDistributionInfo(score) {
         if (score >= 9.5) return { tier: "Generational Rarity", percentile: "0.01%", position: 97.5 };
         if (score >= 9.0) return { tier: "Supermodel Tier", percentile: "1%", position: 92.5 };
-        if (score >= 8.5) return { tier: "Highly Attractive", percentile: "2.5%", position: 87.5 };
-        if (score >= 7.0) return { tier: "Attractive", percentile: "10%", position: 77 };
-        if (score >= 6.0) return { tier: "Above Average", percentile: "25%", position: 65 };
+        if (score >= 8.0) return { tier: "Highly Attractive", percentile: "7.5%", position: 87.5 };
+        if (score >= 7.0) return { tier: "Attractive", percentile: "20%", position: 77 };
+        if (score >= 6.0) return { tier: "Above Average", percentile: "30%", position: 65 };
         if (score >= 4.0) {
             const position = 40 + ((score - 4) / 2) * 20;
             return { tier: "Average", percentile: "50%+", position: position };
