@@ -273,9 +273,13 @@ body {
     color: #111827;
 }
 
+/* Find this rule in style.css and add margin-bottom */
+
 .distribution-chart-container {
     width: 100%;
     margin-top: 2rem;
+    margin-bottom: 2rem;
+    /* <-- ADD THIS LINE */
     padding-top: 2rem;
     border-top: 1px solid #e5e7eb;
 }
@@ -317,16 +321,19 @@ body {
 
 .chart-marker {
     position: absolute;
+    top: 0;
+    /* Stretch to the top edge */
     bottom: 0;
+    /* Stretch to the bottom edge */
     transform: translateX(-50%);
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: #ffffff;
-    border: 3px solid #111827;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 2px;
+    /* height property is no longer needed */
+    background-color: #111827;
     z-index: 10;
     transition: left 0.5s ease-out;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
 }
 
 .chart-labels {
@@ -558,9 +565,15 @@ body {
         font-size: 4rem;
     }
 
+
     .ratings-grid {
+        display: flex;
         justify-content: center;
-        gap: 1.5rem;
+        /* <-- ADD THIS LINE */
+        gap: 2.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 2rem;
     }
 
     .lookalike-section,
