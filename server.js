@@ -241,10 +241,9 @@ app.post('/api/generate-looksmatch', upload.single('image'), async (req, res) =>
         res.status(500).json({ error: "Failed to generate looksmatch image. Check server logs for details." });
     }
 });
-
+*/
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 }); 
-*/
