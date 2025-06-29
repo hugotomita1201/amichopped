@@ -1,4 +1,4 @@
-// public/script.js (Corrected with error fix)
+// public/script.js (MODIFIED TO DISPLAY FEATURE-SPECIFIC RECOMMENDATIONS)
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- Page & Element Selection ---
@@ -115,8 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const distInfo = getDistributionInfo(data.overallScore);
             const overallSlide = document.createElement('div');
             overallSlide.className = 'result-slide';
-
-            // --- THIS BLOCK IS NOW CORRECTED ---
             overallSlide.innerHTML = `
             <div class="result-image-panel"><img src="${uploadedFileUrl}" alt="Your Photo" class="result-image"></div>
             <div class="result-analysis-panel">
@@ -154,7 +152,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 ratingsGridHTML += '</div>';
                 let lookalikeHTML = '';
                 if (item.celebrityLookalike) lookalikeHTML = `<div class="lookalike-section"><div class="lookalike-icon"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.98 9.11c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg></div><p class="lookalike-text">Feature reminiscent of <strong>${item.celebrityLookalike}</strong></p></div>`;
-                slide.innerHTML = `<div class="result-image-panel"><img src="${uploadedFileUrl}" alt="${item.featureName || 'Feature Analysis'}" class="result-image"></div><div class="result-analysis-panel"><h3 class="feature-title">${item.featureName || 'Feature Analysis'}</h3>${ratingsGridHTML}<p class="feature-description">${item.reasoning || 'Detailed analysis of this feature.'}</p>${lookalikeHTML}</div>`;
+
+                // --- MODIFICATION START (NEW CODE): Build the feature-specific product recommendation HTML ---
+                let featureProductHTML = '';
+                if (item.recommendedProduct && item.featureProductReason) {
+                    featureProductHTML = `
+                    <div class="feature-product-recommendation" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb; text-align: left;">
+                        <h4 style="font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                            Product Recommendation
+                        </h4>
+                        <p style="font-size: 1rem; color: #4b5563; margin-bottom: 0.5rem;">
+                            <strong>${item.recommendedProduct.name}:</strong> ${item.featureProductReason}
+                        </p>
+                        <a href="${item.recommendedProduct.affiliateLink}" target="_blank" class="cta-button font-medium py-1 px-3 rounded-lg text-xs" style="background-color: #f3f4f6; color: #374151;">
+                            View Product
+                            <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </div>
+                    `;
+                }
+                // --- MODIFICATION END ---
+
+                // The innerHTML now includes the new featureProductHTML block
+                slide.innerHTML = `<div class="result-image-panel"><img src="${uploadedFileUrl}" alt="${item.featureName || 'Feature Analysis'}" class="result-image"></div><div class="result-analysis-panel"><h3 class="feature-title">${item.featureName || 'Feature Analysis'}</h3>${ratingsGridHTML}<p class="feature-description">${item.reasoning || 'Detailed analysis of this feature.'}</p>${lookalikeHTML}${featureProductHTML}</div>`;
                 scrollContainer.appendChild(slide);
             });
         }
@@ -195,11 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="feature-description mb-8">Based on your potential analysis, here are the most impactful product types we recommend to help you reach your goals.</p>
                     <div class="action-plan-products">${productsHTML}</div>
                     <p class="text-xs text-gray-400 mt-4">As an Amazon Associate, AURA may earn from qualifying purchases. This is not medical advice.</p>
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                        <h4 class="font-semibold text-lg text-gray-800">Ready for the next step?</h4>
-                        <p class="text-gray-600 mb-4">Generate a photorealistic AI looksmatch to see another perspective.</p>
-                        <button id="launch-looksmatch-btn" class="cta-button font-medium py-2 px-4 rounded-lg text-sm">Launch Looksmatch Generator</button>
-                    </div>
+                    
+
                 </div>
             `;
             scrollContainer.appendChild(planSlide);
@@ -361,3 +379,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+{/*
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <h4 class="font-semibold text-lg text-gray-800">Ready for the next step?</h4>
+                        <p class="text-gray-600 mb-4">Generate a photorealistic AI looksmatch to see another perspective.</p>
+                        <button id="launch-looksmatch-btn" class="cta-button font-medium py-2 px-4 rounded-lg text-sm">Launch Looksmatch Generator</button>
+                    </div>
+                    */}

@@ -1,30 +1,51 @@
 [
     {
         "id": "SKN001",
-        "productType": "Gentle Hydrating Cleanser",
-        "name": "CeraVe Hydrating Facial Cleanser",
-        "description": "A gentle, non-foaming face wash with hyaluronic acid, ceramides, and glycerin to help hydrate skin without stripping moisture.",
-        "affiliateLink": "https://www.amazon.com/CeraVe-Hydrating-Facial-Cleanser-Fragrance/dp/B01MSSDEPK/?tag=YOUR_TAG_HERE"
+        "productType": "Beef Tallow Moisturizer for Sensitive Skin",
+        "name": "100% Grass Fed Beef Tallow for Skin Care",
+        "description": "Face + Body - Whipped Moisturizer for Sensitive Skin - Natural Lotion, 4 FL. oz. (Unscented)",
+        "affiliateLink": "https://amzn.to/4ltPcHs"
     },
     {
         "id": "SKN002",
         "productType": "SPF 50+ Sunscreen",
         "name": "La Roche-Posay Anthelios Melt-In Milk Sunscreen SPF 60",
         "description": "A fast-absorbing, velvety texture sunscreen suitable for face and body. Broad-spectrum protection with a non-greasy finish.",
-        "affiliateLink": "https://www.amazon.com/Roche-Posay-Anthelios-Sunscreen-Broad-Spectrum/dp/B002C1E12K/?tag=YOUR_TAG_HERE"
+        "affiliateLink": "https://amzn.to/44nIY5f"
+    },
+    {
+        "id": "EYEN001",
+        "productType": "Castor Oil for Eyebrows",
+        "name": "Kate Blanc Cosmetics Castor Oil Organic (2oz)",
+        "description": "commonly used in beauty routines to condition and support the appearance of fuller-looking brows, especially those that appear sparse or over-tweezed.",
+        "affiliateLink": "https://amzn.to/4lBr9GV"
     },
     {
         "id": "SKN003",
-        "productType": "Tretinoin (Prescription)",
-        "name": "Tretinoin Cream/Gel (Retin-A)",
-        "description": "A powerful retinoid that increases skin cell turnover. Used to treat acne, fine lines, and hyperpigmentation. Requires a dermatologist's prescription.",
-        "affiliateLink": "https://www.goodrx.com/tretinoin?tag=YOUR_TAG_HERE"
+        "productType": "Tinted Sunscreen SPF 40+",
+        "name": "La Roche-Posay Anthelios Tinted Sunscreen SPF 40+",
+        "description": "2023 Allure Best of Beauty Awards Winner. Face sunscreen with broad spectrum UVA/UVB protection SPF 50 with iron oxides. Tinted mineral sunscreen with no white cast. Non-greasy, fast absorbing texture with a matte finish.",
+        "affiliateLink": "https://amzn.to/44qabnN"
     },
     {
         "id": "HAR001",
-        "productType": "Volumizing Shampoo",
-        "name": "Biolage Volume Bloom Shampoo",
-        "description": "Gently cleanses hair with minimal stripping while adding lightweight volume and shine. Paraben-free formula suitable for color-treated hair.",
-        "affiliateLink": "https://www.amazon.com/BIOLAGE-Volume-Bloom-Shampoo-Liter/dp/B00ID136ZM/?tag=YOUR_TAG_HERE"
+        "productType": "5% Minoxidil for Men",
+        "name": "Kirkland Minoxidil 5% for Men, Topical Solution Extra Strength Hair Regrowth Treatment",
+        "description": "CLINICALLY PROVEN Hair Regrowth Treatment for Men to help regrow hair on the top of the scalp.",
+        "affiliateLink": "https://amzn.to/4l3mJIG"
+    },
+    {
+        "id": "SKN004",
+        "productType": "Gentle Face Cleanser",
+        "name": "La Roche-Posay Toleriane Hydrating Gentle Face Cleanser",
+        "description": "Daily face wash for normal to dry sensitive skin. A cream cleanser that helps skin retain essential moisture while cleansing. ",
+        "affiliateLink": "https://amzn.to/4kiMaVr"
+    },
+    {
+        "id": "LIP001",
+        "productType": "Lip Balm",
+        "name": "Burt's Bees LIp Balm",
+        "description": "Daily lip balm for dry/sensitive lips",
+        "affiliateLink": "https://amzn.to/4l9M97G"
     }
 ]

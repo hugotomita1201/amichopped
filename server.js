@@ -1,4 +1,4 @@
-// server.js (Final Correct Version with Unified Potential Prompt)
+// server.js (MODIFIED FOR FEATURE-SPECIFIC RECOMMENDATIONS)
 
 require('dotenv').config();
 const express = require('express');
@@ -21,9 +21,24 @@ const vertex_ai = new VertexAI({
 
 
 // --- 1. LOAD OUR PRODUCT DATABASE & SYSTEM PROMPT ---
-const productsPath = path.join(__dirname, 'products.json');
-const allProducts = JSON.parse(fs.readFileSync(productsPath, 'utf-8'));
+let allProducts;
+try {
+    const productsPath = path.join(__dirname, 'products.json');
+    const fileContent = fs.readFileSync(productsPath, 'utf-8');
+    allProducts = JSON.parse(fileContent);
+    console.log("Successfully loaded products.json.");
+} catch (error) {
+    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    console.error("!!! FATAL ERROR: Could not load or parse products.json !!!");
+    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    console.error("Error Details:", error.message);
+    console.error("\nPlease check the following:");
+    console.error("1. Is 'products.json' in the same folder as 'server.js'?");
+    console.error("2. Is the JSON syntax valid? (Check for extra commas or missing brackets).");
+    process.exit(1);
+}
 const productListForPrompt = allProducts.map(p => `- ID: ${p.id}, Type: ${p.productType}`).join('\n');
+
 
 // --- THIS IS THE NEW, UNIFIED SYSTEM PROMPT ---
 const systemPrompt = `
@@ -49,12 +64,16 @@ All scores represent a percentile ranking on a normal distribution curve of the 
 * **Ethnic Context:** You MUST factor in the user's probable ethnicity to establish the "average" (5.0 anchor) for proportional analysis.
 * **Facial Adiposity:** Apply a severe penalty to the relevant scores for high levels of facial fat, as it obscures the underlying bone structure.
 
+// --- MODIFICATION START (1 of 2): Updated AI instructions for feature analysis ---
 **C. Detailed Feature Analysis Content**
 For Eyes, Eyebrows, Nose, Mouth & Jaw, Skin, Hair, and Facial Harmony, you MUST provide:
 * **Ratings:** \`aestheticRating\`, \`harmonyRating\`, and \`healthRating\` (use \`null\` if a rating is not applicable).
 * **Reasoning:** A paragraph explaining the ratings.
 * **Celebrity Lookalike:** A relevant celebrity comparison for that specific feature.
 * **Bounding Box:** A mandatory \`boundingBox\` object \`{ "x": ..., "y": ..., "width": ..., "height": ... }\`.
+* **featureProductId:** The ID of the single most relevant product from the "AVAILABLE PRODUCTS" list that could improve this specific feature. Use \`null\` if no product is relevant or suitable.
+* **featureProductReason:** A very short, single sentence explaining why the selected product is recommended for this feature. Use \`null\` if no product is selected.
+// --- MODIFICATION END (1 of 2) ---
 
 
 ---
@@ -73,7 +92,7 @@ This is the most critical reasoning step. Your reasoning for the \`potentialScor
 
 ---
 ### Part 3: Product Selection
-Based *only* on the key areas for improvement identified in the \`potentialSummary\`, select between 0 and 4 relevant product IDs from the list below. This list is your only source for products.
+Based *only* on the key areas for improvement identified in the \`potentialSummary\`, select between 0 and 4 relevant product IDs for the main action plan. This list is your only source for products.
 
 --- AVAILABLE PRODUCTS ---
 ${productListForPrompt}
@@ -84,6 +103,7 @@ ${productListForPrompt}
 ### CRITICAL: Final JSON Output Structure
 Your entire output must be a single, valid JSON object following this exact structure. Do not add any text or formatting like \`\`\`json before or after the object.
 
+// --- MODIFICATION START (2 of 2): Updated JSON example structure ---
 \`\`\`json
 {
   "overallScore": 5.8,
@@ -98,7 +118,9 @@ Your entire output must be a single, valid JSON object following this exact stru
       "healthRating": null,
       "reasoning": "The jawline possesses strong, angular contours, but its definition is currently obscured by a layer of soft tissue. The underlying skeletal structure is a significant positive attribute.",
       "celebrityLookalike": "Henry Cavill (structure)",
-      "boundingBox": { "x": 0.25, "y": 0.60, "width": 0.5, "height": 0.25 }
+      "boundingBox": { "x": 0.25, "y": 0.60, "width": 0.5, "height": 0.25 },
+      "featureProductId": "JAW001",
+      "featureProductReason": "Using a Gua Sha can help reduce puffiness and reveal more of the underlying jaw definition."
     },
     {
       "featureName": "Skin",
@@ -107,7 +129,9 @@ Your entire output must be a single, valid JSON object following this exact stru
       "healthRating": 4.8,
       "reasoning": "The skin shows signs of uneven texture and some minor blemishes, which detracts from overall facial clarity. The tone is generally consistent but could be improved with a dedicated skincare regimen.",
       "celebrityLookalike": null,
-      "boundingBox": { "x": 0.1, "y": 0.1, "width": 0.8, "height": 0.8 }
+      "boundingBox": { "x": 0.1, "y": 0.1, "width": 0.8, "height": 0.8 },
+      "featureProductId": "SKN001",
+      "featureProductReason": "A retinol-based product will directly address uneven texture by promoting skin cell turnover."
     }
   ],
   "recommendedProductIds": [
@@ -117,6 +141,7 @@ Your entire output must be a single, valid JSON object following this exact stru
   ]
 }
 \`\`\`
+// --- MODIFICATION END (2 of 2) ---
 `;
 
 // --- Middleware Setup ---
@@ -140,12 +165,29 @@ app.post('/api/analyze', upload.single('image'), async (req, res) => {
         const result = await model.generateContent(["Analyze this user's facial features based on my instructions.", imagePart]);
         const jsonResponseText = result.response.text().replace(/```json|```/g, '').trim();
         const aiResponse = JSON.parse(jsonResponseText);
+
+        // --- MODIFICATION START (NEW LOGIC): Enrich the feature analysis with full product details ---
+        if (aiResponse.analysis && Array.isArray(aiResponse.analysis)) {
+            aiResponse.analysis.forEach(feature => {
+                if (feature.featureProductId) {
+                    const productDetails = allProducts.find(p => p.id === feature.featureProductId);
+                    if (productDetails) {
+                        feature.recommendedProduct = productDetails; // Add the full product object to the feature
+                    }
+                }
+            });
+        }
+        // --- MODIFICATION END ---
+
+
+        // (This part for the main Action Plan remains the same)
         let recommendedProducts = [];
         if (aiResponse.recommendedProductIds) {
             recommendedProducts = aiResponse.recommendedProductIds
                 .map(id => allProducts.find(p => p.id === id))
                 .filter(p => p !== undefined);
         }
+
         const finalResponse = { ...aiResponse, recommendedProducts: recommendedProducts };
         res.json(finalResponse);
         console.log("Successfully sent enriched analysis to user.");
@@ -156,6 +198,8 @@ app.post('/api/analyze', upload.single('image'), async (req, res) => {
 });
 
 // --- 4. NEW LOOKSMATCH API ENDPOINT (REPLACED WITH CORRECT VERTEX AI METHOD) ---
+
+/*
 app.post('/api/generate-looksmatch', upload.single('image'), async (req, res) => {
     console.log("Received a request to /api/generate-looksmatch");
     try {
@@ -202,4 +246,5 @@ app.post('/api/generate-looksmatch', upload.single('image'), async (req, res) =>
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
-});
+}); 
+*/
