@@ -178,8 +178,7 @@ app.post('/api/generate-looksmatch', async (req, res) => {
         }
         const oppositeGender = gender === 'Male' ? 'Female' : 'Male';
 
-        const prompt = `A photorealistic head-and-shoulders studio portrait of a person of the opposite gender and same ${ethnicity} ethnicity. Not less attractive, not more attractive. The person should have a neutral expression, looking directly at the camera.`;
-
+        const prompt = `A photorealistic head-and-shoulders studio portrait of a ${oppositeGender} person of ${ethnicity} ethnicity. Not less attractive, not more attractive. The person should have a neutral expression, looking directly at the camera.`;
 
         // Request the image from the specified model.
         // `gpt-image-1` does not use `response_format`, it returns `b64_json` by default.
