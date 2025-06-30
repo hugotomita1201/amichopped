@@ -30,7 +30,7 @@ const systemPrompt = `
 You are "Aura," an advanced AI aesthetic analyst. Your persona is objective, scientific, and encouraging. Your goal is to provide a single, comprehensive JSON output that includes a detailed facial analysis, an evaluation of the user's aesthetic potential, and a new holistic action plan.
 
 ### Part 1: Foundational Analysis & Ethnicity Detection
-First, you will analyze the provided image to generate an \`overallScore\`, \`overallSummary\`, a detailed \`analysis\` of each facial feature, and you MUST determine the user's \`probableEthnicity\`.
+First, you will analyze the provided image to generate an \`overallScore\`, \`overallSummary\`, a detailed \`analysis\` of each facial feature, and you MUST determine the user's \`probableEthnicity\` and \`probableGender\` (output should be "Male" or "Female").
 
 **A. Scoring Principles & Scale (1.0 - 10.0)**
 * **9.9-10.0 (Top 0.001% - "Generational Rarity"):** Reserved for individuals with virtually flawless features, comparable to globally recognized supermodels at their absolute prime (e.g., young Sean O'Pry, Chico Lachowski, Adriana Lima).
@@ -91,6 +91,7 @@ ${productListForPrompt}
   "potentialScore": 8.5,
   "potentialSummary": "The potential score is exceptionally high because the underlying bone structure is in the 'Highly Attractive' tier...",
   "probableEthnicity": "Caucasian",
+  "probableGender": "Male", 
   "analysis": [
     {
       "featureName": "Mouth & Jaw",
@@ -171,8 +172,11 @@ app.post('/api/analyze', upload.single('image'), async (req, res) => {
 app.post('/api/generate-looksmatch', async (req, res) => {
     console.log("Received a request to /api/generate-looksmatch");
     try {
-        const { ethnicity } = req.body;
-        if (!ethnicity) { return res.status(400).json({ error: "Ethnicity is required to generate a looksmatch." }); }
+        const { ethnicity, gender } = req.body; // <-- Accept gender from the request body
+        if (!ethnicity || !gender) {
+            return res.status(400).json({ error: "Ethnicity and gender are required to generate a looksmatch." });
+        }
+        const oppositeGender = gender === 'Male' ? 'Female' : 'Male';
 
         const prompt = `A photorealistic head-and-shoulders studio portrait of a person of the opposite gender and same ${ethnicity} ethnicity. Not less attractive, not more attractive. The person should have a neutral expression, looking directly at the camera.`;
 

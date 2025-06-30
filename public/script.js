@@ -179,7 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const paywallSlide = document.getElementById('unlock-slide');
 
             try {
-                const looksmatchResponse = await fetch('/api/generate-looksmatch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ethnicity: data.probableEthnicity }) });
+                const looksmatchResponse = await fetch('/api/generate-looksmatch', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ethnicity: data.probableEthnicity, gender: data.probableGender })
+                });
                 if (!looksmatchResponse.ok) { const errorData = await looksmatchResponse.json(); throw new Error(errorData.error || 'Failed to generate looksmatch image.'); }
                 const looksmatchData = await looksmatchResponse.json();
                 if (paywallSlide) {
