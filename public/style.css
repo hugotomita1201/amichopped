@@ -1,10 +1,9 @@
-/* style.css (Complete and Corrected Version) */
+/* style.css (Reverted to your last working version) */
 
 body {
     background-color: #FFFFFF;
     color: #1F2937;
     font-family: 'Inter', sans-serif;
-    overflow: hidden;
 }
 
 /* --- Page Management --- */
@@ -179,7 +178,6 @@ body {
     object-fit: cover;
 }
 
-/* This is the corrected Desktop rule */
 .result-analysis-panel {
     width: 40%;
     max-width: 500px;
@@ -237,7 +235,6 @@ body {
 .ratings-grid {
     display: flex;
     justify-content: center;
-    /* Centered for desktop consistency */
     gap: 2.5rem;
     margin-bottom: 2rem;
     border-bottom: 1px solid #e5e7eb;
@@ -271,7 +268,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Centered for consistency */
     gap: 1rem;
 }
 

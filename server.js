@@ -1,26 +1,18 @@
-// server.js (MODIFIED FOR FEATURE-SPECIFIC RECOMMENDATIONS)
+// server.js (DEFINITIVE FIX FOR GPT-IMAGE-1 MODEL)
 
 require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { VertexAI } = require('@google-cloud/vertexai');
 const fs = require('fs');
 const path = require('path');
+const { OpenAI } = require('openai');
 
 const app = express();
 
-// --- Setup for the /analyze endpoint ---
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- Setup for the /generate-looksmatch endpoint ---
-const vertex_ai = new VertexAI({
-    project: process.env.GCP_PROJECT_ID,
-    location: process.env.GCP_LOCATION
-});
-
-
-// --- 1. LOAD OUR PRODUCT DATABASE & SYSTEM PROMPT ---
 let allProducts;
 try {
     const productsPath = path.join(__dirname, 'products.json');
@@ -28,27 +20,19 @@ try {
     allProducts = JSON.parse(fileContent);
     console.log("Successfully loaded products.json.");
 } catch (error) {
-    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     console.error("!!! FATAL ERROR: Could not load or parse products.json !!!");
-    console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     console.error("Error Details:", error.message);
-    console.error("\nPlease check the following:");
-    console.error("1. Is 'products.json' in the same folder as 'server.js'?");
-    console.error("2. Is the JSON syntax valid? (Check for extra commas or missing brackets).");
     process.exit(1);
 }
 const productListForPrompt = allProducts.map(p => `- ID: ${p.id}, Type: ${p.productType}`).join('\n');
 
-
-// --- THIS IS THE NEW, UNIFIED SYSTEM PROMPT ---
 const systemPrompt = `
-You are "Aura," an advanced AI aesthetic analyst. Your persona is objective, scientific, and encouraging. Your goal is to provide a single, comprehensive JSON output that includes a detailed facial analysis, an evaluation of the user's aesthetic potential, and a set of targeted product recommendations based on that potential.
+You are "Aura," an advanced AI aesthetic analyst. Your persona is objective, scientific, and encouraging. Your goal is to provide a single, comprehensive JSON output that includes a detailed facial analysis, an evaluation of the user's aesthetic potential, and a new holistic action plan.
 
-### Part 1: Foundational Analysis
-First, you will analyze the provided image based on the following principles to generate an \`overallScore\`, \`overallSummary\`, and a detailed \`analysis\` of each facial feature.
+### Part 1: Foundational Analysis & Ethnicity Detection
+First, you will analyze the provided image to generate an \`overallScore\`, \`overallSummary\`, a detailed \`analysis\` of each facial feature, and you MUST determine the user's \`probableEthnicity\`.
 
 **A. Scoring Principles & Scale (1.0 - 10.0)**
-All scores represent a percentile ranking on a normal distribution curve of the human population. The scale is not linear.
 * **9.9-10.0 (Top 0.001% - "Generational Rarity"):** Reserved for individuals with virtually flawless features, comparable to globally recognized supermodels at their absolute prime (e.g., young Sean O'Pry, Chico Lachowski, Adriana Lima).
 * **9.5 - 9.9 (Top 0.1% - "Supermodel Tier"):** Elite facial aesthetics.
 * **9.0 - 9.5 (Top 1% - "Extremely Attractive"):** Close to elite features.
@@ -64,35 +48,34 @@ All scores represent a percentile ranking on a normal distribution curve of the 
 * **Ethnic Context:** You MUST factor in the user's probable ethnicity to establish the "average" (5.0 anchor) for proportional analysis.
 * **Facial Adiposity:** Apply a severe penalty to the relevant scores for high levels of facial fat, as it obscures the underlying bone structure.
 
-// --- MODIFICATION START (1 of 2): Updated AI instructions for feature analysis ---
 **C. Detailed Feature Analysis Content**
 For Eyes, Eyebrows, Nose, Mouth & Jaw, Skin, Hair, and Facial Harmony, you MUST provide:
 * **Ratings:** \`aestheticRating\`, \`harmonyRating\`, and \`healthRating\` (use \`null\` if a rating is not applicable).
 * **Reasoning:** A paragraph explaining the ratings.
 * **Celebrity Lookalike:** A relevant celebrity comparison for that specific feature.
-* **Bounding Box:** A mandatory \`boundingBox\` object \`{ "x": ..., "y": ..., "width": ..., "height": ... }\`.
+* **Bounding Box:** A mandatory \`boundingBox\` object.
 * **featureProductId:** The ID of the single most relevant product from the "AVAILABLE PRODUCTS" list that could improve this specific feature. Use \`null\` if no product is relevant or suitable.
 * **featureProductReason:** A very short, single sentence explaining why the selected product is recommended for this feature. Use \`null\` if no product is selected.
-// --- MODIFICATION END (1 of 2) ---
-
 
 ---
 
-### Part 2: Potential Analysis & Actionable Plan (STRICT LOGIC)
-This is the most critical reasoning step. Your reasoning for the \`potentialScore\` must follow this strict logic: The score represents the *gap* between the user's current state and their theoretical maximum based on their fixed bone structure.
-
-**A. Generate Potential Score & Summary:**
-* **Step 1: Identify "Malleable Gaps".** Analyze how much malleable features (skin, facial fat, grooming, hairstyle) are negatively impacting the score. This is the "Room for Improvement".
-* **Step 2: Calculate the Potential.** The \`potentialScore\` should be thought of as \`overallScore\` + "Room for Improvement".
-* **CRITICAL RULE FOR HIGH SCORES:** For any subject with an \`overallScore\` of 9.0 or higher, their potential is already considered realized. Their "Room for Improvement" is minimal. Therefore, their \`potentialScore\` **MUST NOT** be significantly higher than their \`overallScore\`. For example, if the \`overallScore\` is 9.5, the \`potentialScore\` can be 9.6, but it cannot be 9.9.
-* **RULE FOR HIGH POTENTIAL:** A user with a low \`overallScore\` (e.g., 5.0) but excellent, obscured bone structure could have a very high \`potentialScore\` (e.g., 8.5), as their "Room for Improvement" is large.
+### Part 2: Potential Analysis
 * **\`potentialSummary\`:** The summary must clearly justify the score based on this strict logic.
     * **For a high-scorer (like Sean O'Pry):** The summary MUST state something like: "This individual is already at or near their genetic peak. As such, the potential score reflects a fully realized aesthetic with minimal room for malleable improvement."
     * **For a high-potential user:** The summary MUST state something like: "The potential score is exceptionally high because the underlying bone structure is excellent. Significant improvement is possible by addressing malleable factors such as..."
 
 ---
-### Part 3: Product Selection
-Based *only* on the key areas for improvement identified in the \`potentialSummary\`, select between 0 and 4 relevant product IDs for the main action plan. This list is your only source for products.
+
+### Part 3: Holistic Action Plan Generation
+Based on all your previous analysis and the \`potentialSummary\`, you will now generate a \`holisticActionPlan\` object. This plan should identify the 1-3 most impactful areas for improvement and provide both lifestyle and product advice for each.
+
+**\`holisticActionPlan\` Object Structure:**
+*   \`keyImprovementAreas\`: An array of objects. Each object represents a major focus area.
+    *   \`areaTitle\`: A clear title (e.g., "Improving Skin Clarity & Texture").
+    *   \`problemStatement\`: A short sentence explaining why this area is a priority based on your analysis.
+    *   \`lifestyleAdvice\`: An array of strings. Each string is a concrete, actionable piece of non-product advice (e.g., "Establish a consistent daily skincare routine," "Consider a sustainable caloric deficit to reveal more facial definition."). Be specific and helpful.
+    *   \`productRecommendations\`: An array of 1-2 relevant product IDs from the "AVAILABLE PRODUCTS" list that directly address this area.
+*   \`finalEncouragement\`: A concluding sentence to motivate the user.
 
 --- AVAILABLE PRODUCTS ---
 ${productListForPrompt}
@@ -101,149 +84,132 @@ ${productListForPrompt}
 ---
 
 ### CRITICAL: Final JSON Output Structure
-Your entire output must be a single, valid JSON object following this exact structure. Do not add any text or formatting like \`\`\`json before or after the object.
-
-// --- MODIFICATION START (2 of 2): Updated JSON example structure ---
 \`\`\`json
 {
   "overallScore": 5.8,
-  "overallSummary": "This individual possesses a solid foundational structure, particularly in the midface. The overall score is currently constrained by soft tissue factors and skin health, which creates a 'horn effect' by obscuring the underlying potential.",
+  "overallSummary": "This individual possesses a solid foundational structure, particularly in the midface...",
   "potentialScore": 8.5,
-  "potentialSummary": "The potential score is exceptionally high, indicating that the underlying bone structure is in the 'Highly Attractive' tier. The most significant gains can be achieved by focusing on two key malleable areas: 1) Reducing facial adiposity to reveal the strong jawline and cheekbones, and 2) Improving skin clarity and texture to create a more even complexion.",
+  "potentialSummary": "The potential score is exceptionally high because the underlying bone structure is in the 'Highly Attractive' tier...",
+  "probableEthnicity": "Caucasian",
   "analysis": [
     {
       "featureName": "Mouth & Jaw",
       "aestheticRating": 5.2,
       "harmonyRating": 6.5,
       "healthRating": null,
-      "reasoning": "The jawline possesses strong, angular contours, but its definition is currently obscured by a layer of soft tissue. The underlying skeletal structure is a significant positive attribute.",
+      "reasoning": "The jawline possesses strong, angular contours...",
       "celebrityLookalike": "Henry Cavill (structure)",
       "boundingBox": { "x": 0.25, "y": 0.60, "width": 0.5, "height": 0.25 },
       "featureProductId": "JAW001",
-      "featureProductReason": "Using a Gua Sha can help reduce puffiness and reveal more of the underlying jaw definition."
-    },
-    {
-      "featureName": "Skin",
-      "aestheticRating": 4.5,
-      "harmonyRating": 5.0,
-      "healthRating": 4.8,
-      "reasoning": "The skin shows signs of uneven texture and some minor blemishes, which detracts from overall facial clarity. The tone is generally consistent but could be improved with a dedicated skincare regimen.",
-      "celebrityLookalike": null,
-      "boundingBox": { "x": 0.1, "y": 0.1, "width": 0.8, "height": 0.8 },
-      "featureProductId": "SKN001",
-      "featureProductReason": "A retinol-based product will directly address uneven texture by promoting skin cell turnover."
+      "featureProductReason": "Using a Gua Sha can help reduce puffiness..."
     }
   ],
-  "recommendedProductIds": [
-    "SKN001",
-    "SKN003",
-    "JAW001"
-  ]
+  "holisticActionPlan": {
+    "keyImprovementAreas": [
+      {
+        "areaTitle": "Improving Skin Clarity & Texture",
+        "problemStatement": "Your analysis indicates that the primary factor holding back your score is skin texture and minor acne.",
+        "lifestyleAdvice": [
+          "Establish a consistent daily skincare routine: Cleanse, treat, moisturize, and apply sunscreen every morning.",
+          "Consider reducing dairy and high-sugar foods, which can be inflammatory for some individuals.",
+          "Ensure you are changing your pillowcase every 2-3 days to reduce bacteria transfer."
+        ],
+        "productRecommendations": [ "SKN001", "SKN003" ]
+      }
+    ],
+    "finalEncouragement": "By focusing on these key areas, a significant improvement in your score is highly achievable. Consistency is key."
+  }
 }
 \`\`\`
-// --- MODIFICATION END (2 of 2) ---
 `;
 
-// --- Middleware Setup ---
 app.use(express.static('public'));
 app.use(express.json());
 const upload = multer({ storage: multer.memoryStorage() });
 
-
-// --- 3. EXISTING ANALYSIS API ENDPOINT (Unchanged) ---
 app.post('/api/analyze', upload.single('image'), async (req, res) => {
     console.log("Received a request to /api/analyze");
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: "No image file uploaded." });
-        }
+        if (!req.file) { return res.status(400).json({ error: "No image file uploaded." }); }
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash",
             systemInstruction: systemPrompt,
         });
         const imagePart = { inlineData: { data: req.file.buffer.toString("base64"), mimeType: req.file.mimetype } };
         const result = await model.generateContent(["Analyze this user's facial features based on my instructions.", imagePart]);
-        const jsonResponseText = result.response.text().replace(/```json|```/g, '').trim();
+        const jsonResponseText = result.response.text().replace(/```json|```/g, '').replace(/\\n/g, "\\n");
         const aiResponse = JSON.parse(jsonResponseText);
 
-        // --- MODIFICATION START (NEW LOGIC): Enrich the feature analysis with full product details ---
         if (aiResponse.analysis && Array.isArray(aiResponse.analysis)) {
             aiResponse.analysis.forEach(feature => {
                 if (feature.featureProductId) {
                     const productDetails = allProducts.find(p => p.id === feature.featureProductId);
-                    if (productDetails) {
-                        feature.recommendedProduct = productDetails; // Add the full product object to the feature
-                    }
+                    if (productDetails) { feature.recommendedProduct = productDetails; }
                 }
             });
         }
-        // --- MODIFICATION END ---
 
-
-        // (This part for the main Action Plan remains the same)
-        let recommendedProducts = [];
-        if (aiResponse.recommendedProductIds) {
-            recommendedProducts = aiResponse.recommendedProductIds
-                .map(id => allProducts.find(p => p.id === id))
-                .filter(p => p !== undefined);
+        if (aiResponse.holisticActionPlan && aiResponse.holisticActionPlan.keyImprovementAreas) {
+            aiResponse.holisticActionPlan.keyImprovementAreas.forEach(area => {
+                if (area.productRecommendations && Array.isArray(area.productRecommendations)) {
+                    area.productRecommendations = area.productRecommendations
+                        .map(id => allProducts.find(p => p.id === id))
+                        .filter(p => p !== undefined);
+                }
+            });
         }
 
-        const finalResponse = { ...aiResponse, recommendedProducts: recommendedProducts };
-        res.json(finalResponse);
-        console.log("Successfully sent enriched analysis to user.");
+        res.json(aiResponse);
+        console.log("Successfully sent enriched analysis with holistic action plan to user.");
     } catch (error) {
         console.error("Error during analysis:", error);
         res.status(500).json({ error: "Failed to analyze image. The AI model may be experiencing issues." });
     }
 });
 
-// --- 4. NEW LOOKSMATCH API ENDPOINT (REPLACED WITH CORRECT VERTEX AI METHOD) ---
-
-/*
-app.post('/api/generate-looksmatch', upload.single('image'), async (req, res) => {
+// --- FINAL MODIFICATION: Corrected for gpt-image-1 model behavior ---
+app.post('/api/generate-looksmatch', async (req, res) => {
     console.log("Received a request to /api/generate-looksmatch");
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: "No image file uploaded." });
+        const { ethnicity } = req.body;
+        if (!ethnicity) { return res.status(400).json({ error: "Ethnicity is required to generate a looksmatch." }); }
+
+        const prompt = `A photorealistic head-and-shoulders studio portrait of a person of the opposite gender and same ${ethnicity} ethnicity. Not less attractive, not more attractive. The person should have a neutral expression, looking directly at the camera.`;
+
+
+        // Request the image from the specified model.
+        // `gpt-image-1` does not use `response_format`, it returns `b64_json` by default.
+        const imageResponse = await openai.images.generate({
+            model: "gpt-image-1",
+            prompt: prompt,
+            n: 1,
+            size: "1024x1024",
+            quality: "medium"
+        });
+
+        // Get the Base64 data from the correct field in the response.
+        const imageBase64 = imageResponse.data[0].b64_json;
+        if (!imageBase64) {
+            throw new Error("The OpenAI API did not return Base64 image data.");
         }
 
-        const generativeModel = vertex_ai.getGenerativeModel({
-            model: 'imagen-3.0-generate-preview-0605',
-        });
+        // Create a Data URI to send to the browser.
+        const imageDataUri = `data:image/png;base64,${imageBase64}`;
 
-        const prompt = "A photorealistic image of a person of the opposite gender who possesses a scientifically equivalent level of facial attractiveness to the person in the provided image. The generated person should be a distinct individual, not a simple gender-swapped version of the original.";
-
-        const filePart = {
-            inlineData: {
-                mimeType: req.file.mimetype,
-                data: req.file.buffer.toString("base64"),
-            }
-        };
-
-        const request = {
-            contents: [{
-                role: 'user',
-                parts: [filePart, { text: prompt }]
-            }],
-        };
-
-        const result = await generativeModel.generateContent(request);
-
-        const imageB64 = result.response.candidates[0].content.parts[0].fileData.data;
-
-        res.status(200).json({
-            looksmatchImage: `data:image/png;base64,${imageB64}`
-        });
-        console.log("Successfully generated looksmatch image via Vertex AI.");
+        // Send the Data URI back to the front-end.
+        res.json({ looksmatchImageData: imageDataUri });
+        console.log("Successfully generated and sent Base64 image data to the user.");
 
     } catch (error) {
         console.error("Fatal error during looksmatch generation:", error);
+        if (error instanceof OpenAI.APIError) {
+            console.error('OpenAI API Error:', error.status, error.name, error.headers);
+        }
         res.status(500).json({ error: "Failed to generate looksmatch image. Check server logs for details." });
     }
 });
-*/
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
-}); 
+});
