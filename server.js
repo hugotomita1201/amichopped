@@ -172,7 +172,7 @@ app.post('/api/analyze', upload.single('image'), async (req, res) => {
 app.post('/api/generate-looksmatch', async (req, res) => {
     console.log("Received a request to /api/generate-looksmatch");
     try {
-        const { ethnicity, gender } = req.body; // <-- Accept gender from the request body
+        const { ethnicity, gender, overallScore } = req.body;
         if (!ethnicity || !gender) {
             return res.status(400).json({ error: "Ethnicity and gender are required to generate a looksmatch." });
         }
