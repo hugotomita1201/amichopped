@@ -192,7 +192,9 @@ body {
 }
 
 .result-analysis-panel::-webkit-scrollbar-track {
-    background: transparent;
+    background: rgba(0, 0, 0, 0.05);
+    /* A slightly visible background */
+    border-radius: 10px;
 }
 
 .result-analysis-panel::-webkit-scrollbar-thumb {
@@ -528,7 +530,8 @@ body {
 }
 
 .action-plan-products::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: rgba(0, 0, 0, 0.05);
+    /* A slightly visible background */
     border-radius: 10px;
 }
 
@@ -590,7 +593,6 @@ body {
         padding: 6rem 1.5rem 8rem 1.5rem;
         gap: 2rem;
         height: 100dvh;
-        overflow-y: auto;
         min-width: 100vw;
         scroll-snap-align: start;
         display: flex;
@@ -612,10 +614,12 @@ body {
         width: 100%;
         max-width: 100%;
         text-align: center;
-        /* Reset desktop-specific styles for mobile */
-        max-height: none;
-        overflow-y: visible;
-        padding-right: 0;
+        max-height: 50vh;
+        /* Give it a max height */
+        overflow-y: auto;
+        /* Allow it to scroll vertically */
+        padding-right: 5px;
+        /* Add some padding for the scrollbar */
     }
 
     .result-image {
