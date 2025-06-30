@@ -180,7 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const looksmatchResponse = await fetch('/api/generate-looksmatch', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ethnicity: data.probableEthnicity, gender: data.probableGender })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+                        ethnicity: data.probableEthnicity, gender: data.probableGender, overallScore: data.overallScore // Add this line
+                    })
                 });
                 if (!looksmatchResponse.ok) { const errorData = await looksmatchResponse.json(); throw new Error(errorData.error || 'Failed to generate looksmatch image.'); }
                 const looksmatchData = await looksmatchResponse.json();

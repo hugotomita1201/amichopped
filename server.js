@@ -44,7 +44,7 @@ First, you will analyze the provided image to generate an \`overallScore\`, \`ov
 * **1.0 ("Lowest Percentile"):** Represents severe facial dysmorphia. Use extreme caution and a supportive tone for scores below 4.0.
 
 **B. Critical Considerations**
-* **Multiplier Effect (Halo/Horn):** The \`overallScore\` is NOT a simple average. A single exceptional feature can elevate the score (halo effect), while a feature rated significantly below average will have a disproportionately negative impact (horn effect).
+* **Multiplier Effect (Halo/Horn):** The \`overallScore\` is NOT a simple average. a feature rated significantly below average will have a disproportionately negative impact (horn effect).
 * **Ethnic Context:** You MUST factor in the user's probable ethnicity to establish the "average" (5.0 anchor) for proportional analysis.
 * **Facial Adiposity:** Apply a severe penalty to the relevant scores for high levels of facial fat, as it obscures the underlying bone structure.
 
@@ -178,7 +178,7 @@ app.post('/api/generate-looksmatch', async (req, res) => {
         }
         const oppositeGender = gender === 'Male' ? 'Female' : 'Male';
 
-        const prompt = `A photorealistic head-and-shoulders studio portrait of a ${oppositeGender} person of ${ethnicity} ethnicity. Not less attractive, not more attractive. The person should have a neutral expression, looking directly at the camera.`;
+        const prompt = `A photorealistic head-and-shoulders studio portrait of a ${oppositeGender} person of ${ethnicity} ethnicity, with an attractiveness score of approximately ${overallScore.toFixed(1)} out of 10. The person should have a neutral expression, looking directly at the camera.`;
 
         // Request the image from the specified model.
         // `gpt-image-1` does not use `response_format`, it returns `b64_json` by default.
