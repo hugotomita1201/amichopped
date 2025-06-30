@@ -1,4 +1,4 @@
-// public/script.js (Reverted to your last working version)
+// public/script.js
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- Page & Element Selection ---
@@ -137,6 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // --- PREMIUM CONTENT DISABLED ---
+        /*
         // --- PART 2: Generate the "Unlock Premium" Paywall Slide ---
         const unlockSlide = document.createElement('div');
         unlockSlide.id = 'unlock-slide';
@@ -159,17 +161,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         <li>✓ In-depth Potential Summary</li>
                     </ul>
                 </div>
-                <a href="https://facemaxx.lemonsqueezy.com/buy/bae660cf-28c2-4029-98d8-b3fd98987cad" target="_blank" class="cta-button font-medium py-3 px-8 rounded-full text-base w-full">Unlock Now for $0.99</a>
+                <a href="https://facemaxx.lemonsqueezy.com/buy/your-new-link-here" target="_blank" class="cta-button font-medium py-3 px-8 rounded-full text-base w-full">Unlock Now for $0.99</a>
                 <button id="generate-premium-btn" class="font-medium text-sm text-gray-500 mt-4 hover:text-gray-800">I've already paid, generate my report.</button>
             </div>
         `;
         scrollContainer.appendChild(unlockSlide);
+        */
 
         if (resultsNav) { resultsPage.insertBefore(scrollContainer, resultsNav); }
         else { resultsPage.appendChild(scrollContainer); }
 
         setupCarousel(scrollContainer);
 
+        // --- PREMIUM CONTENT DISABLED ---
+        /*
         // --- PART 3: Add the "Generate on Demand" logic ---
         document.getElementById('generate-premium-btn').addEventListener('click', async () => {
             const unlockButton = document.getElementById('generate-premium-btn');
@@ -180,8 +185,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const looksmatchResponse = await fetch('/api/generate-looksmatch', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
-                        ethnicity: data.probableEthnicity, gender: data.probableGender, overallScore: data.overallScore // Add this line
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({
+                        ethnicity: data.probableEthnicity, 
+                        gender: data.probableGender, 
+                        overallScore: data.overallScore
                     })
                 });
                 if (!looksmatchResponse.ok) { const errorData = await looksmatchResponse.json(); throw new Error(errorData.error || 'Failed to generate looksmatch image.'); }
@@ -233,6 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (loadingOverlay) loadingOverlay.classList.add('hidden');
             }
         });
+        */
     }
 
     function setupCarousel(scrollContainer) {
